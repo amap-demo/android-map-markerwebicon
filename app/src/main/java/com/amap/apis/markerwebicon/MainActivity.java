@@ -31,7 +31,7 @@ import java.net.URL;
  * Created by zxy on 2017/8/23.
  */
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements AMap.OnMapClickListener, AMap.OnMarkerClickListener {
     private AMap aMap;
     private MapView mapView;
 
@@ -58,9 +58,13 @@ public class MainActivity extends Activity {
         if (aMap == null) {
             aMap = mapView.getMap();
         }
+        aMap.setOnMapClickListener(this);
+        aMap.setOnMarkerClickListener(this);
 
+        LatLng BEIJING = new LatLng(40.081217, 116.600292);
+        Marker marker = new webMarker(aMap,iconUrl,new MarkerOptions().position(BEIJING)).getMarker();
 
-        testMarkerWithBitmap();
+//        testMarkerWithBitmap();
 
         testMarkerWithView();
 
@@ -73,10 +77,9 @@ public class MainActivity extends Activity {
      */
     private void testMarkerWithBitmap() {
 
-        LatLng BEIJING = new LatLng(39.90403, 116.407525);// 北京市经纬度
+        LatLng BEIJING = new LatLng(39.90403, 116.407525);
         //添加Marker 并放置一个默认的图标
         marker = aMap.addMarker(new MarkerOptions().position(BEIJING).icon(BitmapDescriptorFactory.defaultMarker()));
-
 
         //开启线程下载图片
         new Thread(new Runnable() {
@@ -112,7 +115,6 @@ public class MainActivity extends Activity {
         TextView textView = new TextView(this);
         textView.setText("加载网络图标");
         layout.addView(textView);
-
 
         BitmapDescriptor bitmapDescriptor = BitmapDescriptorFactory.fromBitmap(convertViewToBitmap(layout));
         viewMarker.setIcon(bitmapDescriptor);
@@ -213,4 +215,14 @@ public class MainActivity extends Activity {
         mapView.onDestroy();
     }
 
+    @Override
+    public void onMapClick(LatLng latLng) {
+        new webMarker(aMap,iconUrl,new MarkerOptions().position(latLng));
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        marker.remove();
+        return true;
+    }
 }
